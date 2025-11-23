@@ -9,13 +9,11 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 from tqdm.auto import tqdm
+import os
 
 # Import HRNet models
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from .HRnet_model import HRNet
-from .dataset import CellDataset
+from .dataset import CCPDatasetWrapper
 from .config import *
 
 
@@ -117,14 +115,12 @@ def train_hrnet_pipeline(
     print(f"Using device: {device}")
     
     # Create model
-    
     model = HRNet(
         in_channels=1,
         out_channels=1,
         base_channels=base_channels,
         dropout_rate=dropout_rate
     )
-
     
     model = model.to(device)
     
@@ -134,8 +130,8 @@ def train_hrnet_pipeline(
     
     # Create datasets
     print("\nCreating datasets...")
-    train_dataset = CellDataset(num_samples=train_samples, is_train=True)
-    val_dataset = CellDataset(num_samples=val_samples, is_train=False)
+    train_dataset = CCPDatasetWrapper(length=train_samples)
+    val_dataset = CCPDatasetWrapper(length=val_samples)
     
     train_loader = DataLoader(
         train_dataset,
