@@ -14,11 +14,9 @@ from tqdm.auto import tqdm
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from HRnet_model import HRNet
-
-# Import existing modules (adjust paths as needed)
-from modules.data_generator import CellDataset
-from modules.config import *
+from .HRnet_model import HRNet
+from .dataset import CellDataset
+from .config import *
 
 
 def dice_loss(pred, target, smooth=1e-6):
