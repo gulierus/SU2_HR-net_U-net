@@ -14,7 +14,7 @@ from tqdm.auto import tqdm
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from hrnet_model import HRNet, HRNetSmall
+from HRnet_model import HRNet
 
 # Import existing modules (adjust paths as needed)
 from modules.data_generator import CellDataset
