@@ -115,6 +115,8 @@ def sweep_and_save_gif(
     print(f"\nStarting Sweep: {total_runs} combinations...")
 
     best_HOTA = -1.0
+    best_DetA = 0.0  
+    best_AssA = 0.0 
     best_det_params = None
     best_bt_params = None
     best_tracks_df = None
@@ -159,15 +161,22 @@ def sweep_and_save_gif(
 
                 if hota_score > best_HOTA:
                     best_HOTA = hota_score
+                    best_DetA = results.get('DetA', 0)  
+                    best_AssA = results.get('AssA', 0)
                     best_det_params = det_params
                     best_bt_params = bt_params
                     best_tracks_df = tracks_df
                     print(f"  *** New Best HOTA: {best_HOTA:.4f} ***")
 
-    print("\nSweep Completed.")
-    print(f"Best HOTA: {best_HOTA:.4f}")
-    print(f"Best Det Params: {best_det_params}")
+
+    # Print Best Results
+    print("\n" + "="*80)
+    print("BEST TRACKING RESULTS")
+    print("="*80)
+    print(f"HOTA: {best_HOTA:.4f} | DetA: {best_DetA:.4f} | AssA: {best_AssA:.4f}")
+    print(f"\nBest Det Params: {best_det_params}")
     print(f"Best BTrack Params: {best_bt_params}")
+    print("="*80)
 
     # Save Best HOTA to txt
     hota_output_path = os.path.join(os.path.dirname(gif_output), "best_hota.txt")
