@@ -114,3 +114,40 @@ def patch_dataloader():
     TargetDataLoader.__init__ = patched_dataloader_init
 
     print("Fixed: torch.utils.data.DataLoader has been successfully patched.")
+
+
+def open_tiff_file(filepath):
+    """
+    Load a TIFF file (single or multi-frame) as numpy array.
+    
+    Args:
+        filepath: Path to TIFF file
+        
+    Returns:
+        numpy array with shape (frames, height, width) for multi-frame
+        or (height, width) for single frame
+    """
+    try:
+        # Try tifffile first (best for scientific TIFF)
+        import tifffile
+        return tifffile.imread(filepath)
+    except ImportError:
+        # Fallback to PIL
+        from PIL import Image
+        img = Image.open(filepath)
+        
+        # Handle multi-frame TIFF
+        frames = []
+        try:
+            i = 0
+            while True:
+                img.seek(i)
+                frames.append(np.array(img))
+                i += 1
+        except EOFError:
+            pass
+        
+        if len(frames) == 1:
+            return frames[0]
+        else:
+            return np.array(frames)
