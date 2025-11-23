@@ -160,8 +160,7 @@ def train_hrnet_pipeline(
         optimizer,
         mode='min',
         factor=0.5,
-        patience=patience,
-        verbose=True
+        patience=patience
     )
     
     # Training loop
