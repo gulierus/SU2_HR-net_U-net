@@ -137,7 +137,7 @@ def train_hrnet_pipeline(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=2,
+        num_workers=0,
         pin_memory=True if device.type == 'cuda' else False
     )
     
@@ -145,7 +145,7 @@ def train_hrnet_pipeline(
         val_dataset,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=2,
+        num_workers=0,
         pin_memory=True if device.type == 'cuda' else False
     )
     
