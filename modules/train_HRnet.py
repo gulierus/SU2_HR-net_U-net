@@ -86,6 +86,7 @@ def train_hrnet_pipeline(
     device=None,
     base_channels=32,
     dropout_rate=0.1,
+    save_dir='/content/drive/MyDrive/SU2_Project_HRNet',
     save_best=True
 ):
     """
@@ -159,8 +160,9 @@ def train_hrnet_pipeline(
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
         mode='min',
-        factor=0.5,
-        patience=patience
+        factor=0.7,
+        patience=7, 
+        min_lr=1e-6
     )
     
     # Training loop
@@ -201,10 +203,17 @@ def train_hrnet_pipeline(
             best_val_loss = val_loss
             patience_counter = 0
             if save_best:
+                best_path = os.path.join(save_dir, 'hrnet_best.pth')
                 torch.save(model.state_dict(), 'best_model.pth')
                 print(f"New best model saved! (Val Loss: {val_loss:.4f})")
+                best_path = os.path.join(save_dir, 'hrnet_best.pth')
         else:
             patience_counter += 1
+
+        if (epoch + 1) % 20 == 0:
+            checkpoint_path = os.path.join(save_dir, f'checkpoint_epoch{epoch+1}.pth')
+            torch.save(model.state_dict(), checkpoint_path)
+            print(f" Checkpoint saved: epoch {epoch+1}")
         
         # Early stopping
         if patience_counter >= patience * 2:  # 2x patience for early stopping
@@ -212,12 +221,17 @@ def train_hrnet_pipeline(
             break
     
     # Load best model
+    best_path = os.path.join(save_dir, 'hrnet_best.pth')
     if save_best and os.path.exists('best_model.pth'):
         print("\nLoading best model...")
-        model.load_state_dict(torch.load('best_model.pth'))
+        best_path = os.path.join(save_dir, 'hrnet_best.pth')
     
     print("\nTraining completed!")
     print(f"Best validation loss: {best_val_loss:.4f}")
+
+    final_path = os.path.join(save_dir, 'hrnet_final.pth')
+    torch.save(model.state_dict(), final_path)
+    print(f"Final model saved to: {final_path}")
     
     return model, history
 
