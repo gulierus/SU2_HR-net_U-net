@@ -141,7 +141,7 @@ class HRNet(nn.Module):
         # Stem (initial processing with downsampling to 1/4)
         self.conv1 = nn.Conv2d(in_channels, 64, 3, 2, 1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
-        self.conv2 = nn.Conv2d(64, 64, 3, 2, 1, bias=False)
+        self.conv2 = nn.Conv2d(64, 64, 3, 1, 1, bias=False) 
         self.bn2 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         
@@ -184,17 +184,31 @@ class HRNet(nn.Module):
             num_channels=[base_channels, base_channels * 2, base_channels * 4],
             dropout_rate=dropout_rate
         )
+
+        self.upsample_layers = nn.ModuleList([
+            None,  # Branch 0 - high res
+            nn.Sequential(
+                nn.Conv2d(base_channels * 2, base_channels, 1, bias=False),
+                nn.BatchNorm2d(base_channels),
+                nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+            ),
+            nn.Sequential(
+                nn.Conv2d(base_channels * 4, base_channels, 1, bias=False),
+                nn.BatchNorm2d(base_channels),
+                nn.Upsample(scale_factor=4, mode='bilinear', align_corners=True)
+            )
+        ])
         
         # Final layer for segmentation (only from high-resolution branch)
         self.final_layer = nn.Sequential(
-            nn.Conv2d(base_channels, base_channels, 1, bias=False),
+            nn.Conv2d(base_channels * 3, base_channels, 1, bias=False),
             nn.BatchNorm2d(base_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(base_channels, out_channels, 1)
         )
         
         # Upsample to return to original resolution (4x upsampling)
-        self.upsample = nn.Upsample(scale_factor=4, mode='bilinear', align_corners=True)
+        self.upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
     
     def _make_layer(self, in_channels, out_channels, num_blocks, dropout_rate):
         layers = []
@@ -234,8 +248,14 @@ class HRNet(nn.Module):
         # Stage 3 (parallel processing + fusion)
         x_list = self.stage3(x_list)
         
-        # Take only high-resolution branch
-        x = x_list[0]
+        # V2: Upsample all branches and concatenate
+        upsampled = []
+        for i, feat in enumerate(x_list):
+            if self.upsample_layers[i] is not None:
+                upsampled.append(self.upsample_layers[i](feat))
+            else:
+                upsampled.append(feat)
+        x = torch.cat(upsampled, dim=1)
         
         # Final prediction
         x = self.final_layer(x)
