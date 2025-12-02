@@ -69,6 +69,18 @@ class CCPDatasetWrapper(torch_data.Dataset):
         if k > 0:
             img = np.rot90(img, k)
             mask = np.rot90(mask, k)
+        
+        # 4. Gaussian noise 
+        if np.random.rand() > 0.5:
+            noise = np.random.normal(0, 0.05, img.shape)
+            img = img + noise
+
+        # 5. Random brightness/contrast
+        if np.random.rand() > 0.5:
+            alpha = np.random.uniform(0.8, 1.2)  # contrast
+            beta = np.random.uniform(-0.1, 0.1)  # brightness
+            img = alpha * img + beta
+        
             
         img = (img - img.min()) / (img.max() - img.min() + 1e-6)
         
