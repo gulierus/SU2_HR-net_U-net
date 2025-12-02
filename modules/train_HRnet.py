@@ -15,6 +15,8 @@ import os
 from .HRnet_model import HRNet
 from .dataset import CCPDatasetWrapper
 from .config import *
+from .config import MIN_CELLS, MAX_CELLS
+
 
 
 def dice_loss(pred, target, smooth=1e-6):
