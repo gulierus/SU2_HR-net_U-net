@@ -19,7 +19,7 @@ SIM_CONFIG = {
     "apo_bend": 0.9
 }
 MIN_CELLS = 5
-MAX_CELLS = 15
+MAX_CELLS = 49
 
 # Training Config
 TRAIN_SAMPLES = 500
