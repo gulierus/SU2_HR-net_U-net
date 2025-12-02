@@ -132,9 +132,12 @@ def train_hrnet_pipeline(
     
     # Create datasets
     print("\nCreating datasets...")
-    train_dataset = CCPDatasetWrapper(length=train_samples)
-    val_dataset = CCPDatasetWrapper(length=val_samples)
+    # train_dataset = CCPDatasetWrapper(length=train_samples)
+    # val_dataset = CCPDatasetWrapper(length=val_samples)
     
+    train_dataset = CCPDatasetWrapper(length=train_samples, min_n=MIN_CELLS, max_n=MAX_CELLS)
+    val_dataset = CCPDatasetWrapper(length=val_samples, min_n=MIN_CELLS, max_n=MAX_CELLS)
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
