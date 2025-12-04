@@ -18,7 +18,7 @@ SIM_CONFIG = {
     "apo_cutoff": 2.0,
     "apo_bend": 0.9
 }
-MIN_CELLS = 5
+MIN_CELLS = 15
 MAX_CELLS = 49
 
 # Training Config
