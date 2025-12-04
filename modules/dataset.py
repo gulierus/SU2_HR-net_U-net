@@ -9,7 +9,7 @@ class SyntheticCCPDataset(SyntheticDataset):
     """Synthetic CCP dataset with ground truth masks and optional clustering."""
     
     def __init__(self, min_n=MIN_CELLS, max_n=MAX_CELLS, 
-                 radius_choices=[0.5, 1.0, 1.5, 2.0, 2.5],
+                 radius_choices=[1.0, 1.5, 2.0, 2.5],
                  contrast_fg_range=(0.0, 1.0), contrast_bg_range=(0.0, 1.0),
                  use_clusters=False, cluster_prob=0.6, 
                  cluster_size_range=(2, 6), cluster_spread=8.0):
@@ -93,8 +93,16 @@ class SyntheticCCPDataset(SyntheticDataset):
                         np.log(np.interp(abs_distance / self.thickness, [0, 1], [np.e, 1])))
         full_image = np.sum(parts, -1)
         
-        distances = np.maximum(classes - distance / ((1 - classes) * 2 + radii + self.thickness * 2), 0)
-        y = np.minimum(np.sum(distances, -1), 1)
+        # PUVODNI maska (prekryvajicii se Gaussiany):
+        # distances = np.maximum(classes - distance / ((1 - classes) * 2 + radii + self.thickness * 2), 0)
+        # y = np.minimum(np.sum(distances, -1), 1)
+
+        y = np.zeros((self.patch_size, self.patch_size))
+        for i in range(n):
+            dist_i = np.hypot(self.yyy - positions[i, 0], self.xxx - positions[i, 1])
+            sigma = 1.5  # Mensi = ostrejsi body
+            point_mask = np.exp(-dist_i**2 / (2 * sigma**2))
+            y = np.maximum(y, point_mask)  
         
         x = super()._simulate_sim(full_image)
         return x, y
