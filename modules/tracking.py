@@ -202,6 +202,110 @@ def track_with_btrack(detections_per_frame, val_roi, btrack_params: Optional[BTr
         
     return tracks_df[["frame", "x", "y", "track_id"]]
 
+
+# ============================================================================
+# LAPTRACK TRACKING
+# ============================================================================
+@dataclass
+class LapTrackParams:
+    """
+    Parameters for LapTrack (Linear Assignment Problem) tracking.
+    
+    LapTrack uses graph-based optimization for linking detections across frames.
+    It's particularly good at handling:
+    - Dense scenes with many particles
+    - Temporary occlusions (gap closing)
+    - Variable particle velocities
+    """
+    max_distance: float = 15.0              # Max linking distance between frames
+    track_cost_cutoff: float = 15.0         # Cost cutoff for linking
+    gap_closing_max_frame_count: int = 2    # Max frames to close gaps
+    gap_closing_cost_cutoff: float = 15.0   # Cost cutoff for gap closing
+    min_track_len: int = 5                  # Minimum track length to keep
+
+def track_with_laptrack(
+    detections_per_frame: List[List[Tuple[int, int]]],
+    params: Optional[LapTrackParams] = None
+) -> pd.DataFrame:
+    """
+    Track detections using LapTrack (Linear Assignment Problem tracking).
+    
+    LapTrack uses graph-based optimization to link detections across frames,
+    providing robust tracking even in dense scenes with occlusions.
+    
+    Args:
+        detections_per_frame: List of detections per frame, each as [(x, y), ...]
+        params: LapTrack parameters (uses defaults if None)
+    
+    Returns:
+        DataFrame with columns ['frame', 'x', 'y', 'track_id']
+    """
+    try:
+        from laptrack import LapTrack
+        import networkx as nx
+    except ImportError:
+        raise ImportError(
+            "LapTrack not installed. Install with: pip install laptrack"
+        )
+    
+    if params is None:
+        params = LapTrackParams()
+    
+    if len(detections_per_frame) == 0:
+        return pd.DataFrame(columns=['frame', 'x', 'y', 'track_id'])
+    
+    # Prepare coordinate array per frame
+    coords_per_frame = []
+    for frame_idx, dets in enumerate(detections_per_frame):
+        if len(dets) > 0:
+            coords = np.array([[x, y] for x, y in dets])
+        else:
+            coords = np.empty((0, 2))
+        coords_per_frame.append(coords)
+    
+    # Initialize LapTrack
+    tracker = LapTrack(
+        track_cost_cutoff=params.track_cost_cutoff,
+        gap_closing_cost_cutoff=params.gap_closing_cost_cutoff,
+        gap_closing_max_frame_count=params.gap_closing_max_frame_count,
+    )
+    
+    # Run tracking - returns networkx DiGraph
+    graph = tracker.predict(coords_per_frame)
+    
+    # Extract tracks from graph
+    # Nodes are tuples (frame_idx, det_idx)
+    # Connected components = tracks
+    records = []
+    
+    # Get weakly connected components (each component is one track)
+    for track_id, component in enumerate(nx.weakly_connected_components(graph)):
+        for node in component:
+            frame_idx, det_idx = node
+            if frame_idx < len(coords_per_frame) and det_idx < len(coords_per_frame[frame_idx]):
+                x, y = coords_per_frame[frame_idx][det_idx]
+                records.append({
+                    'frame': frame_idx,
+                    'x': x,
+                    'y': y,
+                    'track_id': track_id
+                })
+    
+    track_df = pd.DataFrame(records)
+    
+    # Sort by frame
+    if not track_df.empty:
+        track_df = track_df.sort_values(['track_id', 'frame']).reset_index(drop=True)
+        
+        # Filter by min track length
+        if params.min_track_len > 1:
+            track_counts = track_df['track_id'].value_counts()
+            valid_tracks = track_counts[track_counts >= params.min_track_len].index
+            track_df = track_df[track_df['track_id'].isin(valid_tracks)]
+    
+    return track_df[["frame", "x", "y", "track_id"]]
+
+
 # ============================================================================
 # METRICS
 # ============================================================================
@@ -314,7 +418,8 @@ def run_tracking_on_validation(
     val_input=None, 
     tracking_method="btrack", 
     detection_params: Optional[DetectionParams] = None,
-    btrack_params: Optional[BTrackParams] = None, 
+    btrack_params: Optional[BTrackParams] = None,
+    laptrack_params: Optional[LapTrackParams] = None,
     y_min=512, y_max=768, x_min=256, x_max=512,
     use_validation_data=False,
     show_visualization=False
@@ -359,6 +464,8 @@ def run_tracking_on_validation(
     # print(f"Linking with {tracking_method}...")
     if tracking_method == "btrack":
         tracks_df = track_with_btrack(detections_per_frame, val_roi, btrack_params)
+    elif tracking_method == "laptrack":
+        tracks_df = track_with_laptrack(detections_per_frame, laptrack_params)
     else:
         tracks_df = link_detections(detections_per_frame)
 
