@@ -151,3 +151,38 @@ def open_tiff_file(filepath):
             return frames[0]
         else:
             return np.array(frames)
+
+# ============================================================================
+# MODEL SAVING UTILITIES
+# ============================================================================
+
+def save_model_to_drive(model, save_dir, model_name="hrnet", save_best=True):
+    """
+    Save trained model to Google Drive or local directory.
+    
+    Args:
+        model: PyTorch model to save
+        save_dir: Directory to save model
+        model_name: Base name for saved files (default: "hrnet")
+        save_best: Whether to also copy best_model.pth if it exists
+    
+    Returns:
+        final_path: Path where final model was saved
+    """
+    import torch
+    import shutil
+    
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Save final model
+    final_path = os.path.join(save_dir, f"{model_name}_final.pth")
+    torch.save(model.state_dict(), final_path)
+    print(f"✓ Final model saved to: {final_path}")
+    
+    # Save best model if exists
+    if save_best and os.path.exists('best_model.pth'):
+        best_path = os.path.join(save_dir, f"{model_name}_best.pth")
+        shutil.copy('best_model.pth', best_path)
+        print(f"✓ Best model saved to: {best_path}")
+    
+    return final_path
