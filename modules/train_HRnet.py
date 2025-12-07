@@ -137,8 +137,21 @@ def train_hrnet_pipeline(
     # train_dataset = CCPDatasetWrapper(length=train_samples)
     # val_dataset = CCPDatasetWrapper(length=val_samples)
     
-    train_dataset = CCPDatasetWrapper(length=train_samples, min_n=MIN_CELLS, max_n=MAX_CELLS)
-    val_dataset = CCPDatasetWrapper(length=val_samples, min_n=MIN_CELLS, max_n=MAX_CELLS)
+    train_dataset = CCPDatasetWrapper(
+                length=train_samples,
+                min_n=MIN_CELLS,
+                max_n=MAX_CELLS,
+                use_clusters=True,
+                cluster_sample_prob=0.5  # ← NOVÝ: 50% s clustery, 50% bez
+    )
+    
+    val_dataset = CCPDatasetWrapper(
+                length=val_samples,
+                min_n=MIN_CELLS,
+                max_n=MAX_CELLS,
+                use_clusters=True,
+                cluster_sample_prob=0.5  # ← NOVÝ
+    )
 
     train_loader = DataLoader(
         train_dataset,

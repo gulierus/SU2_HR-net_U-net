@@ -31,6 +31,7 @@ def finetune_hrnet_pipeline(
     save_best=True,
     # Cluster parameters
     use_clusters=True,
+    cluster_sample_prob=0.7,
     cluster_prob=0.6,
     cluster_size_range=(1, 8),
     cluster_spread=7.0
@@ -113,23 +114,25 @@ def finetune_hrnet_pipeline(
     print(f"  - cluster_spread: {cluster_spread}")
     
     train_dataset = CCPDatasetWrapper(
-        length=train_samples,
-        min_n=MIN_CELLS,
-        max_n=MAX_CELLS,
-        use_clusters=use_clusters,
-        cluster_prob=cluster_prob,
-        cluster_size_range=cluster_size_range,
-        cluster_spread=cluster_spread
+            length=train_samples,
+            min_n=MIN_CELLS,
+            max_n=MAX_CELLS,
+            use_clusters=use_clusters,
+            cluster_sample_prob=cluster_sample_prob,  # ← NOVÝ
+            cluster_prob=cluster_prob,
+            cluster_size_range=cluster_size_range,
+            cluster_spread=cluster_spread
     )
-    
+
     val_dataset = CCPDatasetWrapper(
-        length=val_samples,
-        min_n=MIN_CELLS,
-        max_n=MAX_CELLS,
-        use_clusters=use_clusters,
-        cluster_prob=cluster_prob,
-        cluster_size_range=cluster_size_range,
-        cluster_spread=cluster_spread
+            length=val_samples,
+            min_n=MIN_CELLS,
+            max_n=MAX_CELLS,
+            use_clusters=use_clusters,
+            cluster_sample_prob=cluster_sample_prob,  # ← NOVÝ
+            cluster_prob=cluster_prob,
+            cluster_size_range=cluster_size_range,
+            cluster_spread=cluster_spread
     )
     
     train_loader = DataLoader(

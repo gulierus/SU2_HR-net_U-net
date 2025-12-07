@@ -2,6 +2,10 @@ import torch
 import os
 import yaml
 
+# ============================================================================
+# ENVIRONMENT CONFIGURATION
+# ============================================================================
+
 # Device configuration
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -21,7 +25,10 @@ SIM_CONFIG = {
 MIN_CELLS = 15
 MAX_CELLS = 49
 
-# Training Config
+# ============================================================================
+# TRAINING CONFIGURATION
+# ============================================================================
+
 TRAIN_SAMPLES = 500
 VAL_SAMPLES = 100
 BATCH_SIZE = 8
@@ -64,3 +71,20 @@ if os.path.exists(CONFIG_PATH):
             SIM_CONFIG[k] = v
 
     print("Configuration updated.")
+
+
+# ============================================================================
+# FINE-TUNING CONFIGURATION
+# ============================================================================
+
+# Fine-tuning training parameters (lower LR, fewer samples)
+FINETUNE_LEARNING_RATE = 2e-4  # Lower than initial training 
+FINETUNE_EPOCHS = 25
+FINETUNE_SAMPLES_TRAIN = 2000
+FINETUNE_SAMPLES_VAL = 300
+
+# Fine-tuning clustering parameters (more realistic biological data)
+FINETUNE_CLUSTER_SAMPLE_PROB = 0.7  # 70% samples with clusters, 30% without
+FINETUNE_CLUSTER_PROB = 0.6         # Probability of forming a cluster
+FINETUNE_CLUSTER_SIZE_RANGE = (1, 8)  # Cluster can have 1-8 CCPs
+FINETUNE_CLUSTER_SPREAD = 7.0       # Spatial spread of cluster in pixels

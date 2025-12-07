@@ -10,9 +10,13 @@ class SyntheticCCPDataset(SyntheticDataset):
     
     def __init__(self, min_n=MIN_CELLS, max_n=MAX_CELLS, 
                  radius_choices=[1.0, 1.5, 2.0, 2.5],
-                 contrast_fg_range=(0.0, 1.0), contrast_bg_range=(0.0, 1.0),
-                 use_clusters=False, cluster_prob=0.6, 
-                 cluster_size_range=(2, 6), cluster_spread=8.0):
+                 contrast_fg_range=(0.0, 1.0), 
+                 contrast_bg_range=(0.0, 1.0),
+                 use_clusters=False, 
+                 cluster_sample_prob=0.5,
+                 cluster_prob=0.6, 
+                 cluster_size_range=(2, 6), 
+                 cluster_spread=8.0):
         super().__init__(contrast_fg_range, contrast_bg_range)
         
         self.min_n, self.max_n = min_n, max_n
@@ -29,6 +33,7 @@ class SyntheticCCPDataset(SyntheticDataset):
         
         # Cluster parametry
         self.use_clusters = use_clusters
+        self.cluster_sample_prob = cluster_sample_prob
         self.cluster_prob = cluster_prob
         self.cluster_size_range = cluster_size_range
         self.cluster_spread = cluster_spread
@@ -76,9 +81,9 @@ class SyntheticCCPDataset(SyntheticDataset):
         n = np.random.randint(self.min_n, self.max_n)
         
         # Vyber metodu generovani pozic
-        if self.use_clusters:
+        if self.use_clusters and np.random.random() < self.cluster_sample_prob:
             positions = self._generate_positions_clusters(n)
-            n = len(positions)  # Muze se mirne lisit
+            n = len(positions)
         else:
             positions = self._generate_positions_grid(n)
         
@@ -111,15 +116,21 @@ class SyntheticCCPDataset(SyntheticDataset):
 class CCPDatasetWrapper(torch_data.Dataset):
     """PyTorch Dataset that yields synthetic CCP images and masks on-the-fly."""
     
-    def __init__(self, length=500, min_n=MIN_CELLS, max_n=MAX_CELLS,
-                 use_clusters=False, cluster_prob=0.6, 
-                 cluster_size_range=(2, 6), cluster_spread=8.0):
+    def __init__(self, length=500, 
+                 min_n=MIN_CELLS, 
+                 max_n=MAX_CELLS,
+                 use_clusters=False, 
+                 cluster_sample_prob=0.5,
+                 cluster_prob=0.6, 
+                 cluster_size_range=(2, 6), 
+                 cluster_spread=8.0):
         super().__init__()
         self.length = length
         self._synthetic = SyntheticCCPDataset(
             min_n=min_n, 
             max_n=max_n,
             use_clusters=use_clusters,
+            cluster_sample_prob=cluster_sample_prob,
             cluster_prob=cluster_prob,
             cluster_size_range=cluster_size_range,
             cluster_spread=cluster_spread
