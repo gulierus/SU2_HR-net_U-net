@@ -9,6 +9,7 @@ import time
 import os
 from datetime import timedelta
 from tqdm.auto import tqdm
+
 from modules.tracking import (
     DetectionParams, BTrackParams, LapTrackParams,
     run_tracking_on_validation, CCPDetector, hota, track_with_laptrack

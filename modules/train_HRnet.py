@@ -14,28 +14,9 @@ import os
 # Import HRNet models
 from .HRnet_model import HRNet
 from .dataset import CCPDatasetWrapper
+from .loss import dice_loss, combined_loss
 from .config import *
 from .config import MIN_CELLS, MAX_CELLS
-
-
-
-def dice_loss(pred, target, smooth=1e-6):
-    """Dice loss for binary segmentation."""
-    pred = torch.sigmoid(pred)
-    pred = pred.view(-1)
-    target = target.view(-1)
-    
-    intersection = (pred * target).sum()
-    dice = (2. * intersection + smooth) / (pred.sum() + target.sum() + smooth)
-    
-    return 1 - dice
-
-
-def combined_loss(pred, target, bce_weight=0.5):
-    """Combined BCE + Dice loss."""
-    bce = nn.functional.binary_cross_entropy_with_logits(pred, target)
-    dice = dice_loss(pred, target)
-    return bce_weight * bce + (1 - bce_weight) * dice
 
 
 def train_epoch(model, dataloader, optimizer, device, loss_fn=combined_loss):

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 import json
 import os
 from tqdm.auto import tqdm
+
 from .config import DEVICE
 from .utils import open_tiff_file
 
