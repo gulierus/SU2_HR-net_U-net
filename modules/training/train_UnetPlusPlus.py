@@ -5,13 +5,13 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 from .loss import combined_loss
-from .dataset import CCPDatasetWrapper
-from .UnetPlusPlus_model import UNetPlusPlus
-from .config import (
+from ..data.dataset import CCPDatasetWrapper
+from ..models.UnetPlusPlus_model import UNetPlusPlus
+from ..config import (
     DEVICE, BATCH_SIZE, TRAIN_SAMPLES, VAL_SAMPLES, 
     MIN_CELLS, MAX_CELLS, PATCH_SIZE, SIM_CONFIG
 )
-from .utils import patch_dataloader
+from ..utils import patch_dataloader
 
 
 def train_epoch(model, dataloader, optimizer, device, bce_weight=0.5):

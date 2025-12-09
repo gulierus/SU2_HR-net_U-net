@@ -1,8 +1,9 @@
 import numpy as np
 import torch
 import torch.utils.data as torch_data
+
 from .simulation import SyntheticDataset
-from .config import MIN_CELLS, MAX_CELLS
+from ..config import MIN_CELLS, MAX_CELLS
 
 
 class SyntheticCCPDataset(SyntheticDataset):

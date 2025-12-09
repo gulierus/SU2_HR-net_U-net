@@ -9,9 +9,9 @@ from torch.utils.data import DataLoader
 import os
 
 # Import HRNet model and training utilities
-from .HRnet_model import HRNet
-from .dataset import CCPDatasetWrapper
-from .config import MIN_CELLS, MAX_CELLS, DEVICE
+from ..models.HRnet_model import HRNet
+from ..data.dataset import CCPDatasetWrapper
+from ..config import MIN_CELLS, MAX_CELLS, DEVICE
 from .train_HRnet import train_epoch, validate_epoch
 
 

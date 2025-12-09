@@ -12,11 +12,11 @@ from tqdm.auto import tqdm
 import os
 
 # Import HRNet models
-from .HRnet_model import HRNet
-from .dataset import CCPDatasetWrapper
+from ..models.HRnet_model import HRNet
+from ..data.dataset import CCPDatasetWrapper
 from .loss import dice_loss, combined_loss
-from .config import *
-from .config import MIN_CELLS, MAX_CELLS
+from ..config import *
+from ..config import MIN_CELLS, MAX_CELLS
 
 
 def train_epoch(model, dataloader, optimizer, device, loss_fn=combined_loss):

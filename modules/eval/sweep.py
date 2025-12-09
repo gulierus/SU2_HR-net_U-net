@@ -10,12 +10,12 @@ import os
 from datetime import timedelta
 from tqdm.auto import tqdm
 
-from modules.tracking import (
+from .tracking import (
     DetectionParams, BTrackParams, LapTrackParams,
     run_tracking_on_validation, CCPDetector, hota, track_with_laptrack
 )
-from modules.utils import open_tiff_file
-from modules.config import DEVICE
+from ..utils import open_tiff_file
+from ..config import DEVICE
 
 def save_tracking_gif(data, image_stack, output_path="tracking_result.gif",
                      y_min=512, y_max=768, x_min=256, x_max=512,
