@@ -123,7 +123,7 @@ def train_hrnet_pipeline(
                 min_n=MIN_CELLS,
                 max_n=MAX_CELLS,
                 use_clusters=True,
-                cluster_sample_prob=0.5  # ← NOVÝ: 50% s clustery, 50% bez
+                cluster_sample_prob=0.5  
     )
     
     val_dataset = CCPDatasetWrapper(
@@ -131,7 +131,7 @@ def train_hrnet_pipeline(
                 min_n=MIN_CELLS,
                 max_n=MAX_CELLS,
                 use_clusters=True,
-                cluster_sample_prob=0.5  # ← NOVÝ
+                cluster_sample_prob=0.5  
     )
 
     train_loader = DataLoader(

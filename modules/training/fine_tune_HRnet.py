@@ -118,7 +118,7 @@ def finetune_hrnet_pipeline(
             min_n=MIN_CELLS,
             max_n=MAX_CELLS,
             use_clusters=use_clusters,
-            cluster_sample_prob=cluster_sample_prob,  # ← NOVÝ
+            cluster_sample_prob=cluster_sample_prob,  
             cluster_prob=cluster_prob,
             cluster_size_range=cluster_size_range,
             cluster_spread=cluster_spread
@@ -129,7 +129,7 @@ def finetune_hrnet_pipeline(
             min_n=MIN_CELLS,
             max_n=MAX_CELLS,
             use_clusters=use_clusters,
-            cluster_sample_prob=cluster_sample_prob,  # ← NOVÝ
+            cluster_sample_prob=cluster_sample_prob,  
             cluster_prob=cluster_prob,
             cluster_size_range=cluster_size_range,
             cluster_spread=cluster_spread
@@ -274,7 +274,7 @@ if __name__ == "__main__":
     
     model, history = finetune_hrnet_pipeline(
         pretrained_path=pretrained_model_path,
-        train_samples=100,  # Small for testing
+        train_samples=100,  
         val_samples=20,
         epochs=2,
         batch_size=4,
