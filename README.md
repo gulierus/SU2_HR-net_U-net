@@ -58,8 +58,8 @@ ccp_pipeline/
 
 ## Improved Synthetic Data Generator
 
-New improvement of Synthetic Data Generator with additional cluster simulations.
-Problem: the original generator can generate only solitude cells and can't simulate clusters which are in real biological data. 
+**Problem:** the original generator can generate only solitude cells and can't simulate clusters which are in real biological data. 
+**Solution:** New improvement of Synthetic Data Generator with additional cluster simulations.
 Key component in `data/dataset.py`. The generator creates realistic microscopy data with accurate ground truth masks.
 
 ### Main Improvements
