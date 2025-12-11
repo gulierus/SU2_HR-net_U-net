@@ -243,3 +243,5 @@ model, history = finetune_hrnet_pipeline(
 [1] Ulicna, K., Vallardi, G., Charras, G. & Sheridan, A. R. (2021). **Automated deep lineage tree analysis using a Bayesian single cell tracking approach.** *Frontiers in Computer Science.* https://doi.org/10.3389/fcomp.2021.734559
 
 [2] Fukai, Y. T., Kawaguchi, K. (2022). **LapTrack: Linear assignment particle tracking with tunable metrics.** *Bioinformatics*, 38(11), 3018–3020. https://doi.org/10.1093/bioinformatics/btac299
+
+[3] AV ČR, UTIA. **https://su2.utia.cas.cz/labs.html**
