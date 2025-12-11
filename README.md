@@ -148,6 +148,96 @@ LapTrackParams(
 
 ---
 
+## Configuration
+
+Configuration is managed in `config.py`. Parameters can be set directly or overridden via `config.yaml`.
+
+### Training Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `TRAIN_SAMPLES` | `500` | Number of training samples per epoch |
+| `VAL_SAMPLES` | `100` | Number of validation samples |
+| `BATCH_SIZE` | `8` | Batch size |
+| `LEARNING_RATE` | `1e-3` | Initial learning rate |
+| `WEIGHT_DECAY` | `1e-4` | L2 regularization |
+| `DROPOUT_RATE` | `0.1` | Dropout rate |
+| `EPOCHS` | `200` | Maximum training epochs |
+| `PATIENCE` | `5` | Early stopping patience |
+
+### Data Generation Parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `MIN_CELLS` | `15` | Minimum CCPs per image |
+| `MAX_CELLS` | `49` | Maximum CCPs per image |
+| `PATCH_SIZE` | `128` | Image size (px) |
+
+### YAML Configuration (Optional)
+
+Create `config.yaml` in the working directory to override defaults:
+
+```yaml
+TRAIN_SAMPLES: 2000
+VAL_SAMPLES: 400
+BATCH_SIZE: 16
+LEARNING_RATE: 5e-4
+EPOCHS: 100
+MIN_CELLS: 10
+MAX_CELLS: 40
+```
+
+### Training Usage
+
+**U-Net++:**
+```python
+from training.train_UnetPlusPlus import train_unetplusplus_pipeline
+
+model, history = train_unetplusplus_pipeline(
+    train_samples=2000,
+    val_samples=400,
+    epochs=100,
+    batch_size=8,
+    learning_rate=1e-3,
+    use_clusters=True,
+    cluster_sample_prob=0.5,
+    features=[32, 64, 128, 256, 512],
+    use_attention=True,
+    save_dir='./checkpoints'
+)
+```
+
+**HRNet:**
+```python
+from training.train_HRnet import train_hrnet_pipeline
+
+model, history = train_hrnet_pipeline(
+    train_samples=2000,
+    val_samples=400,
+    epochs=100,
+    batch_size=8,
+    learning_rate=1e-3,
+    base_channels=48,  # 32 or 48
+    dropout_rate=0.1,
+    save_dir='./checkpoints'
+)
+```
+
+**Fine-tuning HRNet on clustered data:**
+```python
+from training.fine_tune_HRnet import finetune_hrnet_pipeline
+
+model, history = finetune_hrnet_pipeline(
+    pretrained_path='./checkpoints/hrnet_best.pth',
+    train_samples=1500,
+    val_samples=300,
+    epochs=25,
+    learning_rate=2e-4,  # Lower LR for fine-tuning
+    cluster_sample_prob=0.7,
+    cluster_spread=7.0
+)
+```
+
 ## References
 
 [1] Ulicna, K., Vallardi, G., Charras, G. & Sheridan, A. R. (2021). **Automated deep lineage tree analysis using a Bayesian single cell tracking approach.** *Frontiers in Computer Science.* https://doi.org/10.3389/fcomp.2021.734559
